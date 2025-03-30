@@ -7,17 +7,16 @@ export default {
  
     const API_BASE_URL = env.BADGES_BASE_URL || "";
 
-    router.get('/', (req, res) => {
-      res.send(`hello world here is the base url ${API_BASE_URL}`);
-      console.log("Using base URL:", env.BADGES_BASE_URL);
-   
-    });
 
 //  for getting user badges---------------
 
     router.get('/:user_id', async (req, res) => {
       try {
-
+		if (!req.accountability?.user) {
+			return res.status(403).send('Authentication required');
+		  }
+		  
+           console.log("hie",req.accountability.user)
         const { user_id } = req.params;
         const url = `${API_BASE_URL}/api/v1/users/${user_id}/badges`;
         console.log("hie",url)

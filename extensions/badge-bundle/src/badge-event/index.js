@@ -7,18 +7,16 @@ export default {
     // Get the base URL from environment or use default
     const API_BASE_URL = env.BADGES_BASE_URL || "";
 
-    router.get('/', (req, res) => {
-      res.send(`hello world here is the base url ${API_BASE_URL}`);
-      console.log("Using base URL:", env.BADGES_BASE_URL);
-   
-    });
 
 // for creating event POST /badges-event/event  
 	// This endpoint is for creating events	
     router.post('/', async (req, res) => {
       try {
-        console.log('Received request body:', req.body);
-        
+
+		if (!req.accountability?.user) {
+			return res.status(403).send('Authentication required');
+		  }
+		  
         const { event_type, user_id, payload, timestamp } = req.body;
         
         if (!event_type || !user_id || !payload) {
