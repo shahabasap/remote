@@ -1,5 +1,5 @@
 {
-	"name": "badge-system",
+	"name": "badge-bundle",
 	"description": "Please enter a description for your extension",
 	"icon": "extension",
 	"version": "1.0.0",
@@ -18,7 +18,18 @@
 			"app": "dist/app.js",
 			"api": "dist/api.js"
 		},
-		"entries": [],
+		"entries": [
+			{
+				"type": "endpoint",
+				"name": "badge-event",
+				"source": "src/badge-event/index.js"
+			},
+			{
+				"type": "endpoint",
+				"name": "badge-user",
+				"source": "src/badge-user/index.js"
+			}
+		],
 		"host": "^10.10.0"
 	},
 	"scripts": {
