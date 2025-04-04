@@ -1,6 +1,6 @@
 version: 1
-directus: 11.5.1
-vendor: sqlite
+directus: 11.6.0
+vendor: cockroachdb
 collections:
   - collection: attendances
     meta:
@@ -50,78 +50,6 @@ collections:
       versioning: false
     schema:
       name: moods
-  - collection: team_members
-    meta:
-      accountability: all
-      archive_app_filter: true
-      archive_field: null
-      archive_value: null
-      collapse: open
-      collection: team_members
-      color: null
-      display_template: null
-      group: null
-      hidden: false
-      icon: null
-      item_duplication_fields: null
-      note: null
-      preview_url: null
-      singleton: false
-      sort: null
-      sort_field: sort
-      translations: null
-      unarchive_value: null
-      versioning: false
-    schema:
-      name: team_members
-  - collection: team_members_directus_users
-    meta:
-      accountability: all
-      archive_app_filter: true
-      archive_field: null
-      archive_value: null
-      collapse: open
-      collection: team_members_directus_users
-      color: null
-      display_template: null
-      group: null
-      hidden: true
-      icon: import_export
-      item_duplication_fields: null
-      note: null
-      preview_url: null
-      singleton: false
-      sort: null
-      sort_field: null
-      translations: null
-      unarchive_value: null
-      versioning: false
-    schema:
-      name: team_members_directus_users
-  - collection: team_members_teams
-    meta:
-      accountability: all
-      archive_app_filter: true
-      archive_field: null
-      archive_value: null
-      collapse: open
-      collection: team_members_teams
-      color: null
-      display_template: null
-      group: null
-      hidden: true
-      icon: import_export
-      item_duplication_fields: null
-      note: null
-      preview_url: null
-      singleton: false
-      sort: null
-      sort_field: null
-      translations: null
-      unarchive_value: null
-      versioning: false
-    schema:
-      name: team_members_teams
   - collection: teams
     meta:
       accountability: all
@@ -146,6 +74,30 @@ collections:
       versioning: false
     schema:
       name: teams
+  - collection: teams_directus_users
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: status
+      archive_value: archive
+      collapse: open
+      collection: teams_directus_users
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: import_export
+      item_duplication_fields: null
+      note: null
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: active
+      versioning: false
+    schema:
+      name: teams_directus_users
 fields:
   - collection: attendances
     field: id
@@ -173,12 +125,12 @@ fields:
       name: id
       table: attendances
       data_type: integer
-      default_value: null
+      default_value: nextval('public.attendances_id_seq'::REGCLASS)
       max_length: null
-      numeric_precision: null
-      numeric_scale: null
+      numeric_precision: 32
+      numeric_scale: 0
       is_nullable: false
-      is_unique: false
+      is_unique: true
       is_indexed: false
       is_primary_key: true
       is_generated: false
@@ -214,8 +166,8 @@ fields:
       data_type: integer
       default_value: null
       max_length: null
-      numeric_precision: null
-      numeric_scale: null
+      numeric_precision: 32
+      numeric_scale: 0
       is_nullable: true
       is_unique: false
       is_indexed: false
@@ -227,7 +179,7 @@ fields:
       foreign_key_column: null
   - collection: attendances
     field: user_created
-    type: string
+    type: uuid
     meta:
       collection: attendances
       conditions: null
@@ -252,9 +204,9 @@ fields:
     schema:
       name: user_created
       table: attendances
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -294,7 +246,7 @@ fields:
     schema:
       name: date_created
       table: attendances
-      data_type: datetime
+      data_type: timestamp with time zone
       default_value: null
       max_length: null
       numeric_precision: null
@@ -310,7 +262,7 @@ fields:
       foreign_key_column: null
   - collection: attendances
     field: user_updated
-    type: string
+    type: uuid
     meta:
       collection: attendances
       conditions: null
@@ -335,9 +287,9 @@ fields:
     schema:
       name: user_updated
       table: attendances
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -377,7 +329,7 @@ fields:
     schema:
       name: date_updated
       table: attendances
-      data_type: datetime
+      data_type: timestamp with time zone
       default_value: null
       max_length: null
       numeric_precision: null
@@ -393,7 +345,7 @@ fields:
       foreign_key_column: null
   - collection: attendances
     field: user_id
-    type: string
+    type: uuid
     meta:
       collection: attendances
       conditions: null
@@ -418,9 +370,9 @@ fields:
     schema:
       name: user_id
       table: attendances
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -462,9 +414,48 @@ fields:
     schema:
       name: event_type
       table: attendances
-      data_type: varchar
+      data_type: character varying
       default_value: null
       max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: attendances
+    field: i
+    type: uuid
+    meta:
+      collection: attendances
+      conditions: null
+      display: null
+      display_options: null
+      field: i
+      group: null
+      hidden: true
+      interface: select-dropdown-m2o
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 9
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: i
+      table: attendances
+      data_type: uuid
+      default_value: null
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -508,8 +499,48 @@ fields:
     schema:
       name: active_status
       table: directus_users
-      data_type: varchar
+      data_type: character varying
       default_value: offline
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: directus_users
+    field: position
+    type: string
+    meta:
+      collection: directus_users
+      conditions: null
+      display: null
+      display_options: null
+      field: position
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options:
+        placeholder: enter position
+      readonly: false
+      required: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: position
+      table: directus_users
+      data_type: character varying
+      default_value: null
       max_length: 255
       numeric_precision: null
       numeric_scale: null
@@ -548,9 +579,9 @@ fields:
     schema:
       name: id
       table: moods
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: false
@@ -564,7 +595,7 @@ fields:
       foreign_key_column: null
   - collection: moods
     field: user_created
-    type: string
+    type: uuid
     meta:
       collection: moods
       conditions: null
@@ -589,9 +620,9 @@ fields:
     schema:
       name: user_created
       table: moods
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -631,7 +662,7 @@ fields:
     schema:
       name: date_created
       table: moods
-      data_type: datetime
+      data_type: timestamp with time zone
       default_value: null
       max_length: null
       numeric_precision: null
@@ -647,7 +678,7 @@ fields:
       foreign_key_column: null
   - collection: moods
     field: user_updated
-    type: string
+    type: uuid
     meta:
       collection: moods
       conditions: null
@@ -672,9 +703,9 @@ fields:
     schema:
       name: user_updated
       table: moods
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -714,7 +745,7 @@ fields:
     schema:
       name: date_updated
       table: moods
-      data_type: datetime
+      data_type: timestamp with time zone
       default_value: null
       max_length: null
       numeric_precision: null
@@ -753,7 +784,7 @@ fields:
     schema:
       name: emoji
       table: moods
-      data_type: varchar
+      data_type: character varying
       default_value: null
       max_length: 255
       numeric_precision: null
@@ -809,7 +840,7 @@ fields:
       foreign_key_column: null
   - collection: moods
     field: user_id
-    type: string
+    type: uuid
     meta:
       collection: moods
       conditions: null
@@ -833,9 +864,9 @@ fields:
     schema:
       name: user_id
       table: moods
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -846,575 +877,6 @@ fields:
       generation_expression: null
       has_auto_increment: false
       foreign_key_table: directus_users
-      foreign_key_column: id
-  - collection: team_members
-    field: id
-    type: uuid
-    meta:
-      collection: team_members
-      conditions: null
-      display: null
-      display_options: null
-      field: id
-      group: null
-      hidden: true
-      interface: input
-      note: null
-      options: null
-      readonly: true
-      required: false
-      sort: 1
-      special:
-        - uuid
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: id
-      table: team_members
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: false
-      is_unique: true
-      is_indexed: false
-      is_primary_key: true
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members
-    field: sort
-    type: integer
-    meta:
-      collection: team_members
-      conditions: null
-      display: null
-      display_options: null
-      field: sort
-      group: null
-      hidden: true
-      interface: input
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 2
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: sort
-      table: team_members
-      data_type: integer
-      default_value: null
-      max_length: null
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members
-    field: user_created
-    type: string
-    meta:
-      collection: team_members
-      conditions: null
-      display: user
-      display_options: null
-      field: user_created
-      group: null
-      hidden: true
-      interface: select-dropdown-m2o
-      note: null
-      options:
-        template: '{{avatar}} {{first_name}} {{last_name}}'
-      readonly: true
-      required: false
-      sort: 3
-      special:
-        - user-created
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: user_created
-      table: team_members
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: directus_users
-      foreign_key_column: id
-  - collection: team_members
-    field: date_created
-    type: timestamp
-    meta:
-      collection: team_members
-      conditions: null
-      display: datetime
-      display_options:
-        relative: true
-      field: date_created
-      group: null
-      hidden: true
-      interface: datetime
-      note: null
-      options: null
-      readonly: true
-      required: false
-      sort: 4
-      special:
-        - date-created
-        - cast-timestamp
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: date_created
-      table: team_members
-      data_type: datetime
-      default_value: null
-      max_length: null
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members
-    field: user_updated
-    type: string
-    meta:
-      collection: team_members
-      conditions: null
-      display: user
-      display_options: null
-      field: user_updated
-      group: null
-      hidden: true
-      interface: select-dropdown-m2o
-      note: null
-      options:
-        template: '{{avatar}} {{first_name}} {{last_name}}'
-      readonly: true
-      required: false
-      sort: 5
-      special:
-        - user-updated
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: user_updated
-      table: team_members
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: directus_users
-      foreign_key_column: id
-  - collection: team_members
-    field: date_updated
-    type: timestamp
-    meta:
-      collection: team_members
-      conditions: null
-      display: datetime
-      display_options:
-        relative: true
-      field: date_updated
-      group: null
-      hidden: true
-      interface: datetime
-      note: null
-      options: null
-      readonly: true
-      required: false
-      sort: 6
-      special:
-        - date-updated
-        - cast-timestamp
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: date_updated
-      table: team_members
-      data_type: datetime
-      default_value: null
-      max_length: null
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members
-    field: user_id
-    type: alias
-    meta:
-      collection: team_members
-      conditions: null
-      display: null
-      display_options: null
-      field: user_id
-      group: null
-      hidden: false
-      interface: list-m2m
-      note: null
-      options: null
-      readonly: false
-      required: true
-      sort: 8
-      special:
-        - m2m
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-  - collection: team_members
-    field: status
-    type: string
-    meta:
-      collection: team_members
-      conditions: null
-      display: null
-      display_options: null
-      field: status
-      group: null
-      hidden: false
-      interface: select-dropdown
-      note: null
-      options:
-        choices:
-          - text: active
-            value: active
-          - text: archived
-            value: archived
-      readonly: false
-      required: true
-      sort: 9
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: status
-      table: team_members
-      data_type: varchar
-      default_value: null
-      max_length: 255
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members
-    field: team_id
-    type: alias
-    meta:
-      collection: team_members
-      conditions: null
-      display: null
-      display_options: null
-      field: team_id
-      group: null
-      hidden: false
-      interface: list-o2m
-      note: null
-      options: null
-      readonly: false
-      required: true
-      sort: 10
-      special:
-        - o2m
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-  - collection: team_members_directus_users
-    field: id
-    type: integer
-    meta:
-      collection: team_members_directus_users
-      conditions: null
-      display: null
-      display_options: null
-      field: id
-      group: null
-      hidden: true
-      interface: null
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 1
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: id
-      table: team_members_directus_users
-      data_type: integer
-      default_value: null
-      max_length: null
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: false
-      is_unique: false
-      is_indexed: false
-      is_primary_key: true
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: true
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members_directus_users
-    field: team_members_id
-    type: string
-    meta:
-      collection: team_members_directus_users
-      conditions: null
-      display: null
-      display_options: null
-      field: team_members_id
-      group: null
-      hidden: true
-      interface: null
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 2
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: team_members_id
-      table: team_members_directus_users
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: team_members
-      foreign_key_column: id
-  - collection: team_members_directus_users
-    field: directus_users_id
-    type: string
-    meta:
-      collection: team_members_directus_users
-      conditions: null
-      display: null
-      display_options: null
-      field: directus_users_id
-      group: null
-      hidden: true
-      interface: null
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 3
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: directus_users_id
-      table: team_members_directus_users
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: directus_users
-      foreign_key_column: id
-  - collection: team_members_teams
-    field: id
-    type: integer
-    meta:
-      collection: team_members_teams
-      conditions: null
-      display: null
-      display_options: null
-      field: id
-      group: null
-      hidden: true
-      interface: null
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 1
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: id
-      table: team_members_teams
-      data_type: integer
-      default_value: null
-      max_length: null
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: false
-      is_unique: false
-      is_indexed: false
-      is_primary_key: true
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: true
-      foreign_key_table: null
-      foreign_key_column: null
-  - collection: team_members_teams
-    field: team_members_id
-    type: string
-    meta:
-      collection: team_members_teams
-      conditions: null
-      display: null
-      display_options: null
-      field: team_members_id
-      group: null
-      hidden: true
-      interface: null
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 2
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: team_members_id
-      table: team_members_teams
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: team_members
-      foreign_key_column: id
-  - collection: team_members_teams
-    field: teams_id
-    type: string
-    meta:
-      collection: team_members_teams
-      conditions: null
-      display: null
-      display_options: null
-      field: teams_id
-      group: null
-      hidden: true
-      interface: null
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 3
-      special: null
-      translations: null
-      validation: null
-      validation_message: null
-      width: full
-    schema:
-      name: teams_id
-      table: team_members_teams
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: teams
       foreign_key_column: id
   - collection: teams
     field: id
@@ -1442,9 +904,9 @@ fields:
     schema:
       name: id
       table: teams
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: false
@@ -1484,8 +946,8 @@ fields:
       data_type: integer
       default_value: null
       max_length: null
-      numeric_precision: null
-      numeric_scale: null
+      numeric_precision: 32
+      numeric_scale: 0
       is_nullable: true
       is_unique: false
       is_indexed: false
@@ -1497,7 +959,7 @@ fields:
       foreign_key_column: null
   - collection: teams
     field: user_created
-    type: string
+    type: uuid
     meta:
       collection: teams
       conditions: null
@@ -1522,9 +984,9 @@ fields:
     schema:
       name: user_created
       table: teams
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -1564,7 +1026,7 @@ fields:
     schema:
       name: date_created
       table: teams
-      data_type: datetime
+      data_type: timestamp with time zone
       default_value: null
       max_length: null
       numeric_precision: null
@@ -1580,7 +1042,7 @@ fields:
       foreign_key_column: null
   - collection: teams
     field: user_updated
-    type: string
+    type: uuid
     meta:
       collection: teams
       conditions: null
@@ -1605,9 +1067,9 @@ fields:
     schema:
       name: user_updated
       table: teams
-      data_type: char
+      data_type: uuid
       default_value: null
-      max_length: 36
+      max_length: null
       numeric_precision: null
       numeric_scale: null
       is_nullable: true
@@ -1647,7 +1109,7 @@ fields:
     schema:
       name: date_updated
       table: teams
-      data_type: datetime
+      data_type: timestamp with time zone
       default_value: null
       max_length: null
       numeric_precision: null
@@ -1686,7 +1148,7 @@ fields:
     schema:
       name: teams
       table: teams
-      data_type: varchar
+      data_type: character varying
       default_value: null
       max_length: 255
       numeric_precision: null
@@ -1740,87 +1202,6 @@ fields:
       foreign_key_table: null
       foreign_key_column: null
   - collection: teams
-    field: admin_id
-    type: string
-    meta:
-      collection: teams
-      conditions: null
-      display: null
-      display_options: null
-      field: admin_id
-      group: null
-      hidden: false
-      interface: select-dropdown-m2o
-      note: null
-      options: null
-      readonly: false
-      required: false
-      sort: 9
-      special:
-        - m2o
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: admin_id
-      table: teams
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: directus_users
-      foreign_key_column: id
-  - collection: teams
-    field: team_members_id
-    type: string
-    meta:
-      collection: teams
-      conditions: null
-      display: null
-      display_options: null
-      field: team_members_id
-      group: null
-      hidden: false
-      interface: select-dropdown-m2o
-      note: null
-      options:
-        template: '{{id}}'
-      readonly: false
-      required: true
-      sort: 11
-      special:
-        - m2o
-      translations: null
-      validation: null
-      validation_message: null
-      width: half
-    schema:
-      name: team_members_id
-      table: teams
-      data_type: char
-      default_value: null
-      max_length: 36
-      numeric_precision: null
-      numeric_scale: null
-      is_nullable: true
-      is_unique: false
-      is_indexed: false
-      is_primary_key: false
-      is_generated: false
-      generation_expression: null
-      has_auto_increment: false
-      foreign_key_table: team_members
-      foreign_key_column: id
-  - collection: teams
     field: status
     type: string
     meta:
@@ -1837,8 +1218,8 @@ fields:
         choices:
           - text: active
             value: active
-          - text: inactive
-            value: inactive
+          - text: in-active
+            value: in-active
       readonly: false
       required: true
       sort: 12
@@ -1850,8 +1231,192 @@ fields:
     schema:
       name: status
       table: teams
-      data_type: varchar
+      data_type: character varying
       default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: teams
+    field: people
+    type: alias
+    meta:
+      collection: teams
+      conditions: null
+      display: null
+      display_options: null
+      field: people
+      group: null
+      hidden: false
+      interface: list-m2m
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 13
+      special:
+        - m2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+  - collection: teams_directus_users
+    field: id
+    type: integer
+    meta:
+      collection: teams_directus_users
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: teams_directus_users
+      data_type: integer
+      default_value: nextval('public.teams_directus_users_id_seq'::REGCLASS)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: teams_directus_users
+    field: teams_id
+    type: uuid
+    meta:
+      collection: teams_directus_users
+      conditions: null
+      display: null
+      display_options: null
+      field: teams_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: teams_id
+      table: teams_directus_users
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: teams
+      foreign_key_column: id
+  - collection: teams_directus_users
+    field: directus_users_id
+    type: uuid
+    meta:
+      collection: teams_directus_users
+      conditions: null
+      display: null
+      display_options: null
+      field: directus_users_id
+      group: null
+      hidden: false
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: directus_users_id
+      table: teams_directus_users
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_users
+      foreign_key_column: id
+  - collection: teams_directus_users
+    field: status
+    type: string
+    meta:
+      collection: teams_directus_users
+      conditions: null
+      display: null
+      display_options: null
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - text: Active
+            value: active
+          - text: Archive
+            value: archive
+      readonly: false
+      required: true
+      sort: 4
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: status
+      table: teams_directus_users
+      data_type: character varying
+      default_value: active
       max_length: 255
       numeric_precision: null
       numeric_scale: null
@@ -1883,7 +1448,7 @@ relations:
       column: user_created
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: attendances_user_created_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
   - collection: attendances
@@ -1904,7 +1469,7 @@ relations:
       column: user_updated
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: attendances_user_updated_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
   - collection: attendances
@@ -1925,7 +1490,7 @@ relations:
       column: user_id
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: attendances_user_id_foreign
       on_update: NO ACTION
       on_delete: SET NULL
   - collection: moods
@@ -1946,7 +1511,7 @@ relations:
       column: user_created
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: moods_user_created_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
   - collection: moods
@@ -1967,7 +1532,7 @@ relations:
       column: user_updated
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: moods_user_updated_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
   - collection: moods
@@ -1988,15 +1553,15 @@ relations:
       column: user_id
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: moods_user_id_foreign
       on_update: NO ACTION
       on_delete: SET NULL
-  - collection: team_members
+  - collection: teams
     field: user_created
     related_collection: directus_users
     meta:
       junction_field: null
-      many_collection: team_members
+      many_collection: teams
       many_field: user_created
       one_allowed_collections: null
       one_collection: directus_users
@@ -2005,19 +1570,19 @@ relations:
       one_field: null
       sort_field: null
     schema:
-      table: team_members
+      table: teams
       column: user_created
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: teams_user_created_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
-  - collection: team_members
+  - collection: teams
     field: user_updated
     related_collection: directus_users
     meta:
       junction_field: null
-      many_collection: team_members
+      many_collection: teams
       many_field: user_updated
       one_allowed_collections: null
       one_collection: directus_users
@@ -2026,19 +1591,19 @@ relations:
       one_field: null
       sort_field: null
     schema:
-      table: team_members
+      table: teams
       column: user_updated
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: teams_user_updated_foreign
       on_update: NO ACTION
       on_delete: NO ACTION
-  - collection: team_members_directus_users
+  - collection: teams_directus_users
     field: directus_users_id
     related_collection: directus_users
     meta:
-      junction_field: team_members_id
-      many_collection: team_members_directus_users
+      junction_field: teams_id
+      many_collection: teams_directus_users
       many_field: directus_users_id
       one_allowed_collections: null
       one_collection: directus_users
@@ -2047,157 +1612,31 @@ relations:
       one_field: null
       sort_field: null
     schema:
-      table: team_members_directus_users
+      table: teams_directus_users
       column: directus_users_id
       foreign_key_table: directus_users
       foreign_key_column: id
-      constraint_name: null
+      constraint_name: teams_directus_users_directus_users_id_foreign
       on_update: NO ACTION
       on_delete: SET NULL
-  - collection: team_members_directus_users
-    field: team_members_id
-    related_collection: team_members
-    meta:
-      junction_field: directus_users_id
-      many_collection: team_members_directus_users
-      many_field: team_members_id
-      one_allowed_collections: null
-      one_collection: team_members
-      one_collection_field: null
-      one_deselect_action: nullify
-      one_field: user_id
-      sort_field: null
-    schema:
-      table: team_members_directus_users
-      column: team_members_id
-      foreign_key_table: team_members
-      foreign_key_column: id
-      constraint_name: null
-      on_update: NO ACTION
-      on_delete: SET NULL
-  - collection: team_members_teams
+  - collection: teams_directus_users
     field: teams_id
     related_collection: teams
     meta:
-      junction_field: team_members_id
-      many_collection: team_members_teams
+      junction_field: directus_users_id
+      many_collection: teams_directus_users
       many_field: teams_id
       one_allowed_collections: null
       one_collection: teams
       one_collection_field: null
       one_deselect_action: nullify
-      one_field: null
+      one_field: people
       sort_field: null
     schema:
-      table: team_members_teams
+      table: teams_directus_users
       column: teams_id
       foreign_key_table: teams
       foreign_key_column: id
-      constraint_name: null
-      on_update: NO ACTION
-      on_delete: SET NULL
-  - collection: team_members_teams
-    field: team_members_id
-    related_collection: team_members
-    meta:
-      junction_field: teams_id
-      many_collection: team_members_teams
-      many_field: team_members_id
-      one_allowed_collections: null
-      one_collection: team_members
-      one_collection_field: null
-      one_deselect_action: nullify
-      one_field: null
-      sort_field: null
-    schema:
-      table: team_members_teams
-      column: team_members_id
-      foreign_key_table: team_members
-      foreign_key_column: id
-      constraint_name: null
-      on_update: NO ACTION
-      on_delete: SET NULL
-  - collection: teams
-    field: user_created
-    related_collection: directus_users
-    meta:
-      junction_field: null
-      many_collection: teams
-      many_field: user_created
-      one_allowed_collections: null
-      one_collection: directus_users
-      one_collection_field: null
-      one_deselect_action: nullify
-      one_field: null
-      sort_field: null
-    schema:
-      table: teams
-      column: user_created
-      foreign_key_table: directus_users
-      foreign_key_column: id
-      constraint_name: null
-      on_update: NO ACTION
-      on_delete: NO ACTION
-  - collection: teams
-    field: user_updated
-    related_collection: directus_users
-    meta:
-      junction_field: null
-      many_collection: teams
-      many_field: user_updated
-      one_allowed_collections: null
-      one_collection: directus_users
-      one_collection_field: null
-      one_deselect_action: nullify
-      one_field: null
-      sort_field: null
-    schema:
-      table: teams
-      column: user_updated
-      foreign_key_table: directus_users
-      foreign_key_column: id
-      constraint_name: null
-      on_update: NO ACTION
-      on_delete: NO ACTION
-  - collection: teams
-    field: admin_id
-    related_collection: directus_users
-    meta:
-      junction_field: null
-      many_collection: teams
-      many_field: admin_id
-      one_allowed_collections: null
-      one_collection: directus_users
-      one_collection_field: null
-      one_deselect_action: nullify
-      one_field: null
-      sort_field: null
-    schema:
-      table: teams
-      column: admin_id
-      foreign_key_table: directus_users
-      foreign_key_column: id
-      constraint_name: null
-      on_update: NO ACTION
-      on_delete: SET NULL
-  - collection: teams
-    field: team_members_id
-    related_collection: team_members
-    meta:
-      junction_field: null
-      many_collection: teams
-      many_field: team_members_id
-      one_allowed_collections: null
-      one_collection: team_members
-      one_collection_field: null
-      one_deselect_action: nullify
-      one_field: team_id
-      sort_field: null
-    schema:
-      table: teams
-      column: team_members_id
-      foreign_key_table: team_members
-      foreign_key_column: id
-      constraint_name: null
+      constraint_name: teams_directus_users_teams_id_foreign
       on_update: NO ACTION
       on_delete: SET NULL
