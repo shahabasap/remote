@@ -1,0 +1,56 @@
+{
+	"name": "modules",
+	"description": "Please enter a description for your extension",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-extension-bundle"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "bundle",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"entries": [
+			{
+				"type": "module",
+				"name": "dashboard",
+				"source": "src/dashboard/index.js"
+			},
+			{
+				"type": "module",
+				"name": "people",
+				"source": "src/people/index.js"
+			},
+			{
+				"type": "module",
+				"name": "team",
+				"source": "src/team/index.js"
+			},
+			{
+				"type": "module",
+				"name": "sidebar",
+				"source": "src/sidebar/index.js"
+			}
+		],
+		"host": "^10.10.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"validate": "directus-extension validate",
+		"add": "directus-extension add"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "13.0.4",
+		"vue": "^3.5.13"
+	}
+}

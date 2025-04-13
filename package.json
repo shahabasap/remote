@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "cockroachdb": "^1.0.3",
-    "directus": "^11.6.0"
+    "directus": "^11.6.0",
+    "directus-extension-file-preview-endpoint": "^0.1.2"
   }
 }
