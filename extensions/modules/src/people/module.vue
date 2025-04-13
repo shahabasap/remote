@@ -37,26 +37,35 @@
 		  <div class="section-header">
 			<h2>People Management</h2>
 			<div class="actions-container">
-			  <button @click="refreshPeople" class="action-btn refresh">
-				<v-icon name="refresh" />
-				Refresh
+			  <button @click="refreshPeople" class="action-btn refresh" :disabled="loading.people">
+				<v-icon name="refresh" :spin="loading.people" />
+				{{ loading.people ? 'Refreshing...' : 'Refresh' }}
 			  </button>
-			  <button @click="openCreateDialog" class="action-btn create">
+			  <button @click="openCreateDialog" class="action-btn create" :disabled="loading.people">
 				<v-icon name="add" />
 				Add Person
 			  </button>
 			</div>
 		  </div>
   
+		  <!-- Loading Skeleton -->
+		  <div v-if="loading.people" class="loading-skeleton">
+			<div v-for="i in itemsPerPage" :key="i" class="skeleton-row">
+			  <div class="skeleton-avatar"></div>
+			  <div class="skeleton-text short"></div>
+			  <div class="skeleton-text medium"></div>
+			  <div class="skeleton-badge"></div>
+			</div>
+		  </div>
+  
 		  <!-- People Table -->
-		  <div class="people-table-container">
+		  <div v-else class="people-table-container">
 			<table class="people-table">
 			  <thead>
 				<tr>
 				  <th>Name</th>
 				  <th>Email</th>
 				  <th>Status</th>
-				
 				</tr>
 			  </thead>
 			  <tbody>
@@ -73,16 +82,9 @@
 					  {{ formatStatus(person.status) }}
 					</span>
 				  </td>
-				 
 				</tr>
 			  </tbody>
 			</table>
-		  </div>
-  
-		  <!-- Loading State -->
-		  <div v-if="loading.people" class="loading-state">
-			<v-icon name="loading" spin />
-			<span>Loading people...</span>
 		  </div>
   
 		  <!-- Empty State -->
@@ -95,12 +97,12 @@
 		  </div>
   
 		  <!-- Pagination -->
-		  <div v-if="people.length > 0" class="pagination">
-			<button @click="prevPage" :disabled="currentPage === 1">
+		  <div v-if="people.length > 0 && !loading.people" class="pagination">
+			<button @click="prevPage" :disabled="currentPage === 1 || loading.people">
 			  <v-icon name="chevron_left" />
 			</button>
 			<span>Page {{ currentPage }} of {{ totalPages }}</span>
-			<button @click="nextPage" :disabled="currentPage === totalPages">
+			<button @click="nextPage" :disabled="currentPage === totalPages || loading.people">
 			  <v-icon name="chevron_right" />
 			</button>
 		  </div>
@@ -124,16 +126,11 @@
 	  const people = ref([]);
 	  const loading = ref({ people: false });
 	  const currentPage = ref(1);
-	  const itemsPerPage = ref(10);
+	  const itemsPerPage = ref(2);
 	  const totalItems = ref(0);
   
 	  // Computed
 	  const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
-	  const paginatedPeople = computed(() => {
-		const start = (currentPage.value - 1) * itemsPerPage.value;
-		const end = start + itemsPerPage.value;
-		return people.value.slice(start, end);
-	  });
   
 	  // Methods
 	  const getAssetUrl = (id) => id ? `${api.defaults.baseURL}/assets/${id}` : '';
@@ -154,7 +151,8 @@
 			params: { 
 			  fields: ['id', 'first_name', 'last_name', 'email', 'status', 'avatar'],
 			  limit: itemsPerPage.value,
-			  page: currentPage.value
+			  page: currentPage.value,
+			  meta: '*'
 			}
 		  });
 		  people.value = response.data.data || [];
@@ -174,28 +172,25 @@
   
 	  const editPerson = (person) => {
 		console.log('Editing person:', person);
-		// Implement edit functionality
 	  };
   
 	  const confirmDelete = (person) => {
 		console.log('Deleting person:', person);
-		// Implement delete confirmation
 	  };
   
 	  const openCreateDialog = () => {
 		console.log('Opening create dialog');
-		// Implement create functionality
 	  };
   
 	  const nextPage = () => {
-		if (currentPage.value < totalPages.value) {
+		if (currentPage.value < totalPages.value && !loading.value.people) {
 		  currentPage.value++;
 		  fetchPeople();
 		}
 	  };
   
 	  const prevPage = () => {
-		if (currentPage.value > 1) {
+		if (currentPage.value > 1 && !loading.value.people) {
 		  currentPage.value--;
 		  fetchPeople();
 		}
@@ -205,10 +200,11 @@
   
 	  return {
 		user,
-		people: paginatedPeople,
+		people,
 		loading,
 		currentPage,
 		totalPages,
+		itemsPerPage,
 		getAssetUrl,
 		formatStatus,
 		refreshPeople,
@@ -438,4 +434,84 @@
 	align-items: center;
 	gap: 12px;
   }
+
+.loading-skeleton {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--background-subdued);
+  border-radius: 4px;
+}
+
+.skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--background-normal);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+  height: 16px;
+  background: var(--background-normal);
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-text.short {
+  width: 120px;
+}
+
+.skeleton-text.medium {
+  width: 200px;
+}
+
+.skeleton-badge {
+  width: 80px;
+  height: 24px;
+  background: var(--background-normal);
+  border-radius: 12px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.action-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Enhance existing loading state */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px;
+  color: var(--foreground-subdued);
+}
+
+.loading-state .v-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
   </style>
